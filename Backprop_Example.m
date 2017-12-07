@@ -11,6 +11,7 @@ target = [1;1;0;0];
 input = input_data;
 
 % build the network and initilize them
+% first initilize weights
 weight_hidden_layer_1 = randn(2,5);
 weight_hidden_layer_2 = randn(5,1);
 z_1 = input*weight_hidden_layer_1;
@@ -35,7 +36,7 @@ h=figure('units','normalized','outerposition',[0 0 1 1]);
 % prepare for saving gif
 filename = 'Train_XOR_Forward_BackWard_Prop.gif';
 % plot(loss,'*b');
-for i=1:50000
+for i=1:100000
     delta_z2 = delta_output.*activation_deriv(z_2);
     
     delta_z2_to_w2 = a_1;
@@ -107,7 +108,7 @@ for i=1:50000
 %         title('loss over iteration');
 
         radius = 3;
-        plot_x_start = 20;
+        plot_x_start = 	10;
         plot_y_start = 20;
         plot_x_step = 200;
         plot_y_step = 80;
@@ -125,20 +126,20 @@ for i=1:50000
              viscircles([layer1_x(kk),layer1_y(kk)],radius,'EdgeColor','black');
         end
         
-        text(layer1_x(1)-10,layer1_y(2)+20,'input','FontSize',15);    
+        text(layer1_x(1)-20,layer1_y(2)+20,'input','FontSize',15);    
         
         for kk = 1:5
              layer2_x(kk) = plot_x_start + plot_x_step;
              layer2_y(kk) = plot_y_start + (kk-1)*plot_y_step;
              viscircles([layer2_x(kk),layer2_y(kk)],radius,'EdgeColor','b');
         end        
-        text(layer2_x(5)-20,layer2_y(5)+5,'z1=w1*input','FontSize',15); 
+        text(layer2_x(5)-20,layer2_y(5)+5,'z_1=w_1*input','FontSize',15); 
         
         
         layer3_x = plot_x_start + 2*plot_x_step;
         layer3_y = plot_y_start + 2*plot_y_step;
         viscircles([layer3_x, layer3_y],radius,'EdgeColor','b');
-        text(layer3_x-20,layer3_y+35,'z2=w2*a1','FontSize',15); 
+        text(layer3_x-20,layer3_y+35,'z_2=w_2*a_1','FontSize',15); 
         % draw edges (weights) then
         for kk = 1:2
             for jj=1:5
@@ -147,11 +148,11 @@ for i=1:50000
                  txt_x = layer1_x(kk) + 0.65*(layer2_x(jj)-layer1_x(kk));
                  txt_y = layer1_y(kk) + 0.65*(layer2_y(jj)-layer1_y(kk));
                  text(txt_x,txt_y,...
-                    [num2str(weight_hidden_layer_1(kk,jj))],'FontSize',12);
+                    sprintf('%0.3f',weight_hidden_layer_1(kk,jj)),'FontSize',15);
             end
         end
         
-        text(txt_x,txt_y+20,'w1','FontSize',15); 
+        text(txt_x,txt_y+20,'w_1','FontSize',15); 
         
         for kk=1:5
             plot([layer2_x(kk) layer3_x],...
@@ -160,32 +161,35 @@ for i=1:50000
             txt_y = layer2_y(kk) + 0.5*(layer3_y-layer2_y(kk));
             % text the current weight
             text(txt_x,txt_y,...
-                [num2str(weight_hidden_layer_2(kk))],'FontSize',12);
+                sprintf('%0.3f',weight_hidden_layer_2(kk)),'FontSize',15);
             if kk==5
-                text(txt_x,txt_y+20,'w2','FontSize',15); 
+                text(txt_x,txt_y+20,'w_2','FontSize',15); 
             end
             % text activation with red color
             txt_x = layer2_x(kk) + 0.1*(layer3_x-layer2_x(kk));
             txt_y = layer2_y(kk) + 0.1*(layer3_y-layer2_y(kk));
             text(txt_x,txt_y,...
-                [num2str(a_1(1,kk))],'FontSize',12,'Color',[1.0 0 0]);
+                sprintf('%0.4f',a_1(1,kk)),'FontSize',15,'Color',[1.0 0 0]);
         end
-        text(txt_x,txt_y+10,'a1=sigmoid(z1)','FontSize',15); 
+        text(txt_x,txt_y+10,'a_1=sigmoid(z_1)','FontSize',15); 
                
         text(layer1_x(1)-10,layer1_y(1)-10,...
-            ['' num2str(input_data(1,1))],'FontSize',12);
+            ['' num2str(input_data(1,1))],'FontSize',15);
         
-        text(layer1_x(2)-10,layer1_y(2)+10,...
-            ['' num2str(input_data(1,2))],'FontSize',12);       
+        text(layer1_x(2)-10,layer1_y(2)-10,...
+            ['' num2str(input_data(1,2))],'FontSize',15);       
         
         text(layer3_x+10,layer3_y+20,...
-            'ouput=sigmoid(z2)','FontSize',15);
+            'ouput=sigmoid(z_2)','FontSize',15);
         
         text(layer3_x+10,layer3_y+5,...
-            ['ouput=' num2str(a_2(1))],'FontSize',12);
+            ['ouput=' num2str(a_2(1))],'FontSize',15);
         
         text(layer3_x+10,layer3_y-15,...
-            ['loss=' num2str(loss(1))],'FontSize',12, 'Color',[0 0 0]);
+            ['loss=1/2 * (target-output)^2'],'FontSize',15, 'Color',[0 0 0]);
+        
+        text(layer3_x+10,layer3_y-30,...
+            ['loss=' num2str(loss(1))],'FontSize',15, 'Color',[0 0 0]);
         
                       
 
@@ -207,7 +211,7 @@ for i=1:50000
              layer2_y(kk) = plot_y_start + (kk-1)*plot_y_step;
              viscircles([layer2_x(kk),layer2_y(kk)],radius,'EdgeColor','b');
         end
-        text(layer2_x(5)-25,layer2_y(5)+5,'d_z_1=d_l_o_s_s/d_a_1*d_a_1/d_z_1','FontSize',15); 
+        text(layer2_x(5)-25,layer2_y(5)+5,'\partial{loss}/\partial{z_1}=\partial{loss}/\partial{a_1}*\partial{a_1}/\partial{z_1}','FontSize',15); 
         
         layer3_x = plot_x_start + 2*plot_x_step;
         layer3_y = plot_y_start + 2*plot_y_step;
@@ -215,19 +219,19 @@ for i=1:50000
         
         % draw input first
         text(layer1_x(1)-10,layer1_y(1)-10,...
-            ['' num2str(input_data(1,1))],'FontSize',12);
+            ['' num2str(input_data(1,1))],'FontSize',15);
         
-        text(layer1_x(2)-10,layer1_y(2)+10,...
-            ['' num2str(input_data(1,2))],'FontSize',12);
+        text(layer1_x(2)-10,layer1_y(2)-10,...
+            ['' num2str(input_data(1,2))],'FontSize',15);
         
         text(layer3_x-5,layer3_y+30,...
-            ['d_l_o_s_s/d_o_u_t_p_t = outout-target'],'FontSize',15);
+            ['\partial{loss}/\partial{output} = outout-target'],'FontSize',15);
        
         text(layer3_x+10,layer3_y+15,...
-            ['d_l_o_s_s/d_o_u_t_p_t=' num2str(delta_output(1))],'FontSize',12);
+            ['\partial{loss}/\partial{output}=' num2str(delta_output(1))],'FontSize',15);
         
         text(layer3_x+10,layer3_y-5,...
-            ['d_l_o_s_s/d_z_2=' num2str(delta_z2(1))],'FontSize',12);
+            ['\partial{loss}/\partial{z_2}=' num2str(delta_z2(1))],'FontSize',15);
         
         
         % draw d_loss/d_a_1
@@ -238,23 +242,23 @@ for i=1:50000
             txt_y = layer2_y(kk) + 0.5*(layer3_y-layer2_y(kk));
             if kk==5;
                 text(txt_x,txt_y+35,...
-                    ['d_l_o_s_s/d_w_2=d_l_o_s_s/d_z_2 * a_1 '],'FontSize',15);
+                    ['\partial{loss}/\partial{w_2}=\partial{loss}/\partial{z_2} * a_1 '],'FontSize',15);
                 text(txt_x,txt_y+20,...
-                    ['a_1 = d_z_2/d_w_2'],'FontSize',15);
+                    ['a_1 = \partial{z_2}/\partial{w_2}'],'FontSize',15);
             end
 
             % text the current weight
             text(txt_x,txt_y,...
-                [num2str(delta_w2(1,kk))],'FontSize',12,'Color',...
+                sprintf('%0.4f',delta_w2(1,kk)),'FontSize',15,'Color',...
                 [1.0 0.0 1],'FontWeight','bold');
             % text activation with red color
             txt_x = layer2_x(kk) + 0.15*(layer3_x-layer2_x(kk));
             txt_y = layer2_y(kk) + 0.15*(layer3_y-layer2_y(kk));
             text(txt_x,txt_y,...
-                [num2str(delta_a1(1,kk))],'FontSize',12,'Color',[1.0 0.0 0]);
+                sprintf('%0.3f',delta_a1(1,kk)),'FontSize',15,'Color',[1.0 0.0 0]);
             if kk==5;
                 text(txt_x,txt_y+15,...
-                ['d_l_o_s_s/d_a_1=d_l_o_s_s/d_z_2 * w_2'],'FontSize',15);
+                ['\partial{loss}/\partial{a_1}=\partial{loss}/\partial{z_2} * w_2'],'FontSize',15);
             end
 
         end
@@ -267,12 +271,13 @@ for i=1:50000
                  txt_x = layer1_x(kk) + 0.60*(layer2_x(jj)-layer1_x(kk));
                  txt_y = layer1_y(kk) + 0.60*(layer2_y(jj)-layer1_y(kk));
                  text(txt_x,txt_y,...
-                    [num2str(delta_w1(1,jj,kk))],'FontSize',12,'Color',...
+                    sprintf('%0.4f',delta_w1(1,jj,kk)),'FontSize',15,'Color',...
                     [1.0 0.0 1],'FontWeight','bold');
             end
         end
+        
         text(layer1_x(kk),txt_y + 25,...
-                    ['d_l_o_s_s/d_w_1=d_l_o_s_s/d_z_1 * input '],'FontSize',15);
+                    ['\partial{loss}/\partial{w_1}=\partial{loss}/\partial{z_1} * input '],'FontSize',15);
 
         
 %         clf;
@@ -281,8 +286,8 @@ for i=1:50000
         end
 %         set(ht,'Visible','off');
 %         text(40,25,'                 ','FontSize',15);
-        text(0,0,['Note: each training sample contributes to the gradients. The gradients over 4 samples are averaged for real updating.'],...
-            'FontSize',12);
+        text(0,0,['Note: each training sample contributes to gradients of weights. Gradients of weights over 4 samples are averaged for updating.'],...
+            'FontSize',11);
         refreshdata;
 %         ht = text(40,25,num2str(weight_hidden_layer_1(2,1)),'FontSize',10);
         
